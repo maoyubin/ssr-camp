@@ -66,7 +66,9 @@ app.get('*',(req,res)=>{
 
   Promise.all(promises).then(()=>{
 
-    const context = {nameTest:123}
+    const context = {
+      css:[]
+    }
 
     // 把react组件，解析成html
     const content = renderToString(
@@ -88,12 +90,17 @@ app.get('*',(req,res)=>{
     if(context.action=='REPLACE'){
       res.redirect(301, context.url)
     }
+
+    const css = context.css.join('\n')
     // 字符串模板
     res.send(`
     <html>
       <head>
         <meta charset="utf-8"/>
         <title>react ssr</title>
+        <style>
+        ${css}
+        </style>
       </head>
       <body>
         <div id="root">${content}</div>
