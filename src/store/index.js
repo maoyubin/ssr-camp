@@ -12,9 +12,6 @@ const changeList = list=>({
 
 export const getIndexList = server=>{
   return (dispatch, getState, $axios)=>{
-    console.log('$axios1112',$axios.get)
-
-
     return $axios.get('/api/course/list')
       .then(res=>{
         const {list} = res.data
