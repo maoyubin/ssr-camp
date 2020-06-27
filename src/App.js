@@ -36,5 +36,6 @@ export default [
   },
   {
     component:Notfound,
+    key:'Notfound'
   }
 ]

@@ -1,5 +1,7 @@
 // 这里的node代码。会用babel处理
 import React from 'react'
+import path from 'path'
+import fs from 'fs'
 import {renderToString } from 'react-dom/server'
 import express from 'express'
 import {StaticRouter,matchPath, Route, Switch} from 'react-router-dom'
@@ -25,27 +27,41 @@ app.use('/api', proxy('http://localhost:9090', {
 //   '/api',
 //   proxy({ target:'http://localhost:9090', changeOrigin: true}))
 
+function csrRender(res){
+  const filename = path.resolve(process.cwd(), 'public/index.csr.html')
+  const html = fs.readFileSync(filename, 'utf-8')
+
+  return res.send(html)
+}
+
 app.get('*',(req,res)=>{
-  // 获取根据路由渲染出的组件，并且拿到loadData方法 获取数据
-// 存储网络请求
-const promises = [];
-// use `some` to imitate `<Switch>` behavior of selecting only
-// 路由匹配
-routes.some(route=>{
-
-  //console.log('match',matchPath(req.path,route))
-  //console.log('route',route)
-
-
-  const match = matchPath(req.path,route)
-
-  if(match){
-    const {loadData} = route.component
-    if(loadData){
-      promises.push(loadData(store))
+    if(req.query._mode=='csr'){
+      console.log('开启csr 降级')
+      return csrRender(res)
     }
-  }
-})
+
+
+
+    // 获取根据路由渲染出的组件，并且拿到loadData方法 获取数据
+    // 存储网络请求
+    const promises = [];
+    // use `some` to imitate `<Switch>` behavior of selecting only
+    // 路由匹配
+    routes.some(route=>{
+
+      //console.log('match',matchPath(req.path,route))
+      //console.log('route',route)
+
+
+      const match = matchPath(req.path,route)
+
+      if(match){
+        const {loadData} = route.component
+        if(loadData){
+          promises.push(loadData(store))
+        }
+      }
+    })
   // 等待所有网络请求结束再渲染
 
   Promise.all(promises).then(()=>{

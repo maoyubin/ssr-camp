@@ -1,4 +1,6 @@
 const path = require('path')
+const HtmWebpackPlugin = require('html-webpack-plugin')
+
 // 服务端的webpack
 module.exports = {
   mode:"development",
@@ -9,6 +11,13 @@ module.exports = {
     filename:'bundle.js',
     path:path.resolve(__dirname, 'public')
   },
+  plugins:[
+    new HtmWebpackPlugin({
+      filename: 'index.csr.html',
+      template: 'src/index.crs.html',
+      inject: true
+    })
+  ],
   module:{
     rules:[
       { 
